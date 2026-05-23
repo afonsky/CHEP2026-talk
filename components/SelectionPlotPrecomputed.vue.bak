@@ -1,0 +1,169 @@
+<template>
+  <div :id="plotId" :style="{ width: width, height: height }"></div>
+</template>
+
+<script setup>
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import Plotly from 'plotly.js-dist'
+
+const props = defineProps({
+  src: { type: String, required: true },
+  width: { type: String, default: '900px' },
+  height: { type: String, default: '500px' },
+  showBaseline: { type: Boolean, default: true },
+})
+
+const plotId = `selplot-${Math.random().toString(36).slice(2)}`
+const resizeObserver = ref(null)
+
+const HOVER_TMPL =
+  '<b>%{customdata[0]}</b><br>' +
+  'batch_size=%{customdata[1]}<br>' +
+  'peak_lr=%{customdata[2]}<br>' +
+  'l2_reg=%{customdata[3]}<br>' +
+  'activation=%{customdata[4]}<br>' +
+  'num_filters=%{customdata[5]}' +
+  '<extra></extra>'
+
+function buildFrame(f) {
+  return {
+    name: f.name,
+    data: [
+      {
+        x: f.prev_kept.x,
+        y: f.prev_kept.y,
+        customdata: f.prev_kept.customdata,
+        mode: 'markers',
+        type: 'scatter',
+        marker: { color: 'black', size: 5, opacity: 0.9 },
+        hovertemplate: HOVER_TMPL,
+        name: 'prev kept',
+      },
+      {
+        x: f.kept.x,
+        y: f.kept.y,
+        customdata: f.kept.customdata,
+        mode: 'markers',
+        type: 'scatter',
+        marker: { color: 'green', size: 5, opacity: 0.7 },
+        hovertemplate: HOVER_TMPL,
+        name: 'kept',
+      },
+      {
+        x: f.removed.x,
+        y: f.removed.y,
+        customdata: f.removed.customdata,
+        mode: 'markers',
+        type: 'scatter',
+        marker: { color: 'red', size: 5, opacity: 0.7 },
+        hovertemplate: HOVER_TMPL,
+        name: 'removed',
+      },
+    ],
+  }
+}
+
+async function render() {
+  const url = props.src.startsWith('/') ? props.src : `/${props.src}`
+  const resp = await fetch(url)
+  const payload = await resp.json()
+
+  const initialData = [
+    {
+      x: [],
+      y: [],
+      customdata: [],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { color: 'black', size: 5, opacity: 0.9 },
+      hovertemplate: HOVER_TMPL,
+      name: 'prev kept',
+    },
+    {
+      x: payload.initial.x,
+      y: payload.initial.y,
+      customdata: payload.initial.customdata,
+      mode: 'markers',
+      type: 'scatter',
+      marker: { color: 'green', size: 5, opacity: 0.7 },
+      hovertemplate: HOVER_TMPL,
+      name: 'kept',
+    },
+    {
+      x: [],
+      y: [],
+      customdata: [],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { color: 'red', size: 5, opacity: 0.7 },
+      hovertemplate: HOVER_TMPL,
+      name: 'removed',
+    },
+  ]
+
+  if (props.showBaseline) {
+    initialData.push({
+      x: payload.baseline.x,
+      y: payload.baseline.y,
+      mode: 'markers',
+      type: 'scatter',
+      marker: { color: 'gold', size: 8, opacity: 0.9, line: { color: 'black', width: 0.5 } },
+      name: 'baseline',
+    })
+  }
+
+  const frames = payload.frames.map(buildFrame)
+
+  const sliderSteps = frames.map((f) => ({
+    label: f.name,
+    method: 'animate',
+    args: [
+      [f.name],
+      { frame: { duration: 0, redraw: true }, mode: 'immediate', transition: { duration: 0 } },
+    ],
+  }))
+
+  const layout = {
+    xaxis: { title: { text: 'Model Training Time, s' }, range: payload.x_range },
+    yaxis: { title: { text: 'Validation Accuracy' }, range: payload.y_range },
+    paper_bgcolor: 'white',
+    margin: { l: 60, r: 20, t: 20, b: 80 },
+    legend: { x: 1, y: 0, xanchor: 'right', yanchor: 'bottom' },
+    sliders: [
+      {
+        active: 0,
+        steps: sliderSteps,
+        currentvalue: { prefix: 'Step: ', font: { size: 14 } },
+        pad: { t: 40, b: 10 },
+        len: 0.95,
+        x: 0.025,
+      },
+    ],
+  }
+
+  const config = { displayModeBar: false, responsive: true }
+
+  const el = document.getElementById(plotId)
+  if (!el) return
+  await Plotly.newPlot(el, initialData, layout, config)
+  await Plotly.addFrames(el, frames)
+}
+
+onMounted(() => {
+  render()
+  resizeObserver.value = new ResizeObserver(() => {
+    const el = document.getElementById(plotId)
+    if (el) Plotly.Plots.resize(el)
+  })
+  const el = document.getElementById(plotId)
+  if (el) resizeObserver.value.observe(el)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver.value) resizeObserver.value.disconnect()
+  const el = document.getElementById(plotId)
+  if (el) Plotly.purge(el)
+})
+
+watch(() => props.src, render)
+</script>

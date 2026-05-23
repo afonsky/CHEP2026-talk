@@ -117,9 +117,20 @@ function pvalueLabel(s) {
   return `0.${s}`
 }
 
+// Prepend the Vite base URL so absolute "/data/..." paths still resolve when
+// the site is deployed under a subpath (e.g. GitHub Pages /repo-name/).
+const BASE = (import.meta.env?.BASE_URL || '/').replace(/\/+$/, '/')
+function withBase(url) {
+  if (!url) return url
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(url)) return url
+  if (url.startsWith(BASE)) return url
+  return BASE + url.replace(/^\/+/, '')
+}
+
 async function fetchCsv(url) {
-  const resp = await fetch(url)
-  if (!resp.ok) throw new Error(`Failed to fetch ${url}: ${resp.status}`)
+  const full = withBase(url)
+  const resp = await fetch(full)
+  if (!resp.ok) throw new Error(`Failed to fetch ${full}: ${resp.status}`)
   const text = await resp.text()
   return new Promise((resolve, reject) => {
     Papa.parse(text, {
@@ -351,7 +362,7 @@ async function render() {
   }
   const cctRows = cctCache
 
-  const stepsUrl = fmtPath(props.stepsTemplate, params)
+  const stepsUrl = withBase(fmtPath(props.stepsTemplate, params))
   const selResp = await fetch(stepsUrl)
   if (!selResp.ok) {
     status.value = `no data for ${method}/step${warmup}/pv${pvalue}@${lenpath}`

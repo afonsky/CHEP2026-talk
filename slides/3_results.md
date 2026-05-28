@@ -55,31 +55,18 @@
 ##### Note: The visualization is based on a subset of 72 models.
 
 ---
-zoom: 0.92
----
 
 # Discarding Half of the Models per Iter.: Calculations
 
-<div class="grid grid-cols-[2fr_2fr] gap-12">
-<div>
+<center>
 <figure>
-    <img src="/robust_select_72_models_computations_mean.png" style="width: 490px !important;">
+    <img src="/.full_sweep_vs_halving_scatter2.png" style="width: 490px !important;">
 </figure>
-</div>
+</center>
 <div>
-<figure>
-    <img src="/robust_select_72_models_computations_std.png" style="width: 490px !important;">
-</figure>
-</div>
-</div>
 
 <br>
 
-- $M = 72$ models in search set;
-- $k = 3 (5)$ warmup steps are used for selecting best model using mean (std) of accuracy;
-- Robust Select result in $\sim 60-40\%$ less computations than exhaustive search.
-
-<br>
 <v-click at="1">
 
 ### Still computationally demanding. Can we do better?

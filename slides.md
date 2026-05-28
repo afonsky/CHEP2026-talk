@@ -34,7 +34,7 @@ author: Alexey Boldyrev, Fedor Ratnikov, Andrey Shevelev
 <br>
 
 ### <span style="font-size:18.0pt">CHEP 2026</span>
-### <span style="font-size:18.0pt">Bangkok Thailand</span>
+### <span style="font-size:18.0pt">Bangkok, Thailand</span>
 
 <div>
 

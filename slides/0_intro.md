@@ -55,7 +55,7 @@ A simplified diagram illustrating typical stages in experimental particle physic
 <center>
 <figure>
     <img src="/randomization_sources.png" style="width: 335px !important;">
-    <figcaption style="color:#b3b3b3ff; font-size: 10px"><br>Image credit. Our paper
+    <figcaption style="color:#b3b3b3ff; font-size: 10px"><br>Image credit: Our paper
       <a href="https://ieeexplore.ieee.org/document/11030460">doi:10.1109/ACCESS.2025.3578926</a>
     </figcaption>
 </figure>

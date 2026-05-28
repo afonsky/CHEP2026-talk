@@ -2,25 +2,25 @@
   <div class="selection-plot">
     <div v-if="showControls" class="sp-controls">
       <label>
-        metric
+        Ranking metric
         <select v-model="metricLocal">
           <option v-for="o in metricOptions" :key="o" :value="o">{{ o }}</option>
         </select>
       </label>
       <label>
-        sample size
+        Sample size
         <select v-model.number="dtLenLocal">
           <option v-for="o in dtLenOptions" :key="o" :value="o">{{ o }}</option>
         </select>
       </label>
       <label>
-        method
+        Stat. test
         <select v-model="methodLocal">
           <option v-for="o in methodOptionsForMetric" :key="o" :value="o">{{ o }}</option>
         </select>
       </label>
       <label>
-        warmup
+        Warmup steps
         <select v-model.number="warmupLocal">
           <option v-for="o in warmupOptions" :key="o" :value="o">{{ o }}</option>
         </select>
@@ -114,7 +114,7 @@ const BASELINE_BY_DTLEN = {
 }
 
 function pvalueLabel(s) {
-  return `0.${s}`
+  return String(parseInt(s, 10) / 100)
 }
 
 // Prepend the Vite base URL so absolute "/data/..." paths still resolve when

@@ -1,34 +1,43 @@
+# Dataset and Validation Approach
+
+<div class="grid grid-cols-[12fr_2fr] gap-10">
+<div>
+
+### **CIFAR-10** image classification dataset.
+
+<br>
+
+- Standard dataset for image classification known more than 15 years;
+  -  $>95\%$ ($>98\%$) accuracy for modern (pretrained) DL models;
+- 10-classes of low-resolution (32x32) images;
+- 50k/10k train/test examples.
+
+<br>
+
+<center>
+<figure>
+    <img src="/validation_scheme.drawio.png" style="width: 550px !important;">
+</figure>
+</center>
+</div>
+<div>
+<figure>
+    <img src="/cifar10_example.jpg" style="width: 195px !important;">
+</figure>
+</div>
+</div>
+
 ---
-zoom: 0.75 
----
 
-# Dataset
+# Baseline Model(s)
 
-<div class="flex gap-8">
-  <div class="flex-1">
-
-- Dataset **CIFAR-10**:
-    - 50k/10k train/test samples.
-
-
-- Base model:
-    - [Benchopt](https://github.com/benchopt/benchopt)-optimized **ResNet-18** from [paperswithcode.com](https://paperswithcode.com) benchmark ([archived version](http://web.archive.org/web/20250405043955/https://paperswithcode.com/paper/benchopt-reproducible-efficient-and#code));
+- Baseline model:
+    - [Benchopt](https://github.com/benchopt/benchopt)-optimized **ResNet-18** from [paperswithcode.com](https://paperswithcode.com) benchmark ([archived](http://web.archive.org/web/20250405043955/https://paperswithcode.com/paper/benchopt-reproducible-efficient-and#code));
     - Validation accuracy: 95.55% while trained on augmented sample of 50k examples.
 
-
-- Model search space generation:
-  - Created **500 variations** of the base model by adjusting model hyperparameters:
-    - Architecture:
-        - Activation function / Optimizer / Convolution filter number;
-    - Training:
-        - Batch size / Maximum learning rate / L2 regularization parameter.
-
-
-- Evaluation procedure:
-  - Applied the **Robust Model Selection Algorithm** to all 500 model variations<br> on **three different subsets** of the training data of sizes: 10k, 20k, and 30k examples.
-
-</div>
-  <div class="w-40 flex items-center">
-    <img src="/cifar10_example.jpg" class="h-full object-contain" />
-  </div>
-</div>
+- Model search space — **~600 models**:
+  - **540 variations** of the base model with different hyperparameters:
+    - Activation function / Optimizer / # of convolution filters;
+    - Batch size / Peak learning rate / L2 regularization parameter.
+  - **64 variations** of Compact Convolutional Transformer (ViT alternative for small datasets) with different hyperparameters:
+    - Network depth / Batch size / Peak learning rate / Drop path rate.

@@ -60,10 +60,9 @@
 
 <center>
 <figure>
-    <img src="/.full_sweep_vs_halving_scatter2.png" style="width: 490px !important;">
+    <img src="/.full_sweep_vs_halving_scatter2.png" style="width: 790px !important;">
 </figure>
 </center>
-<div>
 
 <br>
 
